@@ -31,12 +31,5 @@ def main():
     os._exit(0)
 
 
-# def DoAdvMith():
-#     # First, make sure none of our heroes are on the map...
-
-#     # Now look for empty spots to go into
-#     for i in range(5):
-#         FindAndEnterMith()
-
 if __name__ == "__main__":
     main()
