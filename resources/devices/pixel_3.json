@@ -1,0 +1,118 @@
+{
+    "height": 2151,
+    "width": 1088,
+    "folder": "pixel_3",
+    "tmp": "./tmp/pixel_3.png",
+    "locations": {
+        "ads": {
+            "exit": {
+                "top": 350,
+                "bottom": 450,
+                "left": 980,
+                "right": 1080,
+                "template": "x_btn.png"
+            }
+        },
+        "mith": {
+            "templates": {
+                "spots": "adv_mith_empty.png",
+                "depart": "adv_mith_depart.png",
+                "attack": "adv_mith_attack.png"
+            },
+            "depart": {
+                "left": 340,
+                "right": 640
+            },
+            "spots": [
+                {
+                    "top": 620,
+                    "bottom": 850,
+                    "left": 90,
+                    "right": 390
+                },
+                {
+                    "top": 720,
+                    "bottom": 950,
+                    "left": 390,
+                    "right": 690
+                },
+                {
+                    "top": 620,
+                    "bottom": 850,
+                    "left": 690,
+                    "right": 990
+                },
+                {
+                    "top": 1000,
+                    "bottom": 1200,
+                    "left": 90,
+                    "right": 390
+                },
+                {
+                    "top": 1080,
+                    "bottom": 1280,
+                    "left": 390,
+                    "right": 690
+                },
+                {
+                    "top": 1000,
+                    "bottom": 1200,
+                    "left": 690,
+                    "right": 990
+                }
+            ]
+        },
+        "menu": {
+            "castle": {
+                "top": 1999,
+                "bottom": 2149,
+                "left": 1,
+                "right": 200
+            },
+            "troop": {
+                "top": 1999,
+                "bottom": 2149,
+                "left": 175,
+                "right": 375
+            },
+            "tower": {
+                "top": 1999,
+                "bottom": 2149,
+                "left": 462,
+                "right": 650
+            },
+            "alliance": {
+                "top": 1999,
+                "bottom": 2149,
+                "left": 715,
+                "right": 910
+            },
+            "world": {
+                "top": 1999,
+                "bottom": 2149,
+                "left": 900,
+                "right": 1088
+            }
+        },
+        "war": {
+            "titan": {
+                "top": 220,
+                "bottom": 1950,
+                "left": 25,
+                "right": 300
+            },
+            "join": {
+                "left": 850,
+                "right": 1050
+            }
+        },
+        "castle": {
+            "bounty": {
+                "icon": {
+                    "left": 55,
+                    "right": 205
+                }
+            }
+        }
+    }
+}
