@@ -19,16 +19,13 @@ pp = pprint.PrettyPrinter(indent=4)
 def main():
     # setup temp dir
     Path("./tmp").mkdir(parents=True, exist_ok=True)
-    # client = api.connect("192.168.86.125", password=None)
-    # client.timeout = 10
-    # client.captureScreen("./pix_3/tmp/ss.png")
+
     kc = KingdomClicker(VNC(), "pixel_3.json")
-    # kc.client.GetScreenshot(kc.device["tmp"])
-    kc.AttackMith(0)
-    # This is where we decide which function set to call into
-    # Currently we only have adv mith and can't currently
-    # get from desktop to game... That is coming though.
-    # DoAdvMith()
+
+    kc.ClearMith()
+
+    for i in range(5):
+        kc.AttackMith(i)
 
     kc.client.client.disconnect()
     os._exit(0)
