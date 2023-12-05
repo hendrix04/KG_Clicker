@@ -6,15 +6,32 @@ from time import sleep
 from random import randint
 
 
+# Note, All public methods (aka actions) should return a boolean so that our orchestator
+# knows if a particular task has succeeded for failed.
 class KingdomClicker:
     """Kingdom Clicker framework! Making automation for KG Easier"""
+
+    # These are fed directly to sleep()....
+    retryDelay = 1  # How long to wait until we try an image match again.
+    clickDelay = 1  # How long to wait after making a click
 
     def __init__(self, client, device):
         # A client that matches what the VNC class provides function wise
         self.client = client
         self.device = json.load(open("./resources/devices/" + device))
+        self.locations = self.device["locations"]
         self.templatePath = "./resources/devices/" + self.device["folder"] + "/"
+        self.defaultCrop = {
+            "left": 0,
+            "right": self.device["width"],
+            "top": 0,
+            "bottom": self.device["height"],
+        }
 
+    # TODO: Make this more robust with image detection
+    # - Check if left most hero slot is empty
+    # - if so we are done
+    # - If not, keep looping through clearing that first spot until it is empty
     def ClearMith(self):
         for i in range(5):
             # TODO: Update this to use config file
@@ -23,47 +40,179 @@ class KingdomClicker:
             self.client.MouseClick(380, 1175)
             sleep(1.5)
 
+        return True
+
+    # EnterAdvMith:
+    # - Find Dimensional Tunnel in the castle view
+    # - Click on Dimensional Tunnel
+    # - Click on Advanced Mithril
+    def EnterAdvMith(self):
+        castle = self.locations["castle"]
+        castleTemplates = castle["templates"]
+        advMithLocation = self.locations["mith"]["advMith"]
+        tunnel = self.__FindLocation(castleTemplates["tunnel"], crop=castle["tunnel"])
+
+        if tunnel["found"]:
+            self.client.MouseClick(tunnel["randomX"], tunnel["randomY"])
+            sleep(3)
+            # TODO: We SHOULD add image detection here
+            self.client.MouseClickRandom(
+                x1=advMithLocation["left"],
+                x2=advMithLocation["right"],
+                y1=advMithLocation["top"],
+                y2=advMithLocation["bottom"],
+            )
+            sleep(3)
+
+            return True
+        return False
+
+    # TODO: Decide if this should be private with a smarter "action" function
     def AttackMith(self, index=None):
-        templates = self.device["locations"]["mith"]["templates"]
-        spots = self.device["locations"]["mith"]["spots"]
+        mith = self.locations["mith"]
+        templates = mith["templates"]
+        spots = mith["spots"]
         location = {} if index is None else spots[index]
-        mine = self.FindLocation(templates["spots"], 0.8, location)
+        mine = self.__FindLocation(templates["spots"], crop=location)
 
         if mine["found"]:
             self.client.MouseClick(mine["left"] + 100, mine["bottom"])
-            sleep(1)
+        else:
+            return False
 
-        attack = self.FindLocation(templates["attack"], 0.9)
+        sleep(1)
+
+        attack = self.__FindLocation(templates["attack"])
 
         if attack["found"]:
             self.client.MouseClick(attack["randomX"], attack["randomY"])
             sleep(1)
 
-            depart = self.FindLocation(templates["depart"], 0.9)
+            depart = self.__FindLocation(templates["depart"])
 
             if depart["found"]:
                 self.client.MouseClick(depart["randomX"], depart["randomY"])
-                # It looks like the victory banner might be messing
-                # up our image detection. This is why this sleep is longer
-                sleep(5)
+                sleep(1)
 
-    # TODO: Add wait / retry logic to FindLocation
-    def FindLocation(self, templateFile: str, threshold: float, crop: dict = {}):
+        return True
+
+    def EnterGame(self):
+        menu = self.locations["menu"]
+        menuTemplates = menu["templates"]
+        ads = self.locations["ads"]
+        adsTemplates = ads["templates"]
+        gameLoc = self.locations["desktop"]["game"]
+        self.client.MouseClick(gameLoc["x"], gameLoc["y"])
+        inGame = False
+        inGameAttempts = 0
+
+        # Wait for a few seconds then try to start detecting a possible marketing X...
+        # We likely want to make this a TAD smarter by looking for something besides
+        # the X first as the X isn't always there and it could create significant delay
+        # for entering the game...
+        # Let's start with a 30 second sleep and then start trying to figure out what
+        # we need to do next...
+        sleep(30)
+
+        # We are going to jump back and forth checking between the castle in the lower
+        # left and the X in the upper right. Once one is detected, we know where to go
+        # from there... On even loops we will check the X, on odd, the castle
+        while not inGame:
+            inGameAttempts += 1
+            if inGameAttempts % 2 == 0:
+                # Odd Attempt
+                # TODO: Castle is found even if the ad screen is up... Look for something
+                # to detect that will be under the ad screen.
+                findLocationOutput = {
+                    "type": "castle",
+                    "data": self.__FindLocation(
+                        menuTemplates["castle"],
+                        crop=menu["castle"],
+                    ),
+                }
+            else:
+                findLocationOutput = {
+                    "type": "x",
+                    "data": self.__FindLocation(
+                        adsTemplates["exit"],
+                        crop=ads["exit"],
+                    ),
+                }
+
+            if findLocationOutput["data"]["found"]:
+                # We need to know which one we found...
+                if findLocationOutput["type"] == "x":
+                    # First close the box that we found...
+                    self.client.MouseClick(
+                        findLocationOutput["data"]["randomX"],
+                        findLocationOutput["data"]["randomY"],
+                    )
+
+                    # Because there can potentially be multiple windows to close, let's
+                    # now loop through until we find no more X icons...
+                    foundX = True
+                    while foundX:
+                        findLocationOutput = self.__FindLocation(
+                            adsTemplates["exit"],
+                            crop=ads["exit"],
+                            maxRetry=3,
+                        )
+
+                        if findLocationOutput["found"]:
+                            self.client.MouseClick(
+                                findLocationOutput["randomX"],
+                                findLocationOutput["randomY"],
+                            )
+                        else:
+                            foundX = False
+
+                    # Let's try to detect the castle again... If it is there then we
+                    # have gotten into the game. If for some reason it isn't there
+                    # then something has gone wrong and we should exit to desktop and
+                    # give up for this execution.
+                    findLocationOutput = self.__FindLocation(
+                        menuTemplates["castle"],
+                        crop=menu["castle"],
+                    )
+
+                else:
+                    # No adds! Yay! Click on the castle to get us to our
+                    # default starting postion
+                    sleep(3)
+                    self.client.MouseClick(
+                        findLocationOutput["data"]["randomX"],
+                        findLocationOutput["data"]["randomY"],
+                    )
+                    inGame = True
+
+        return True
+
+    def ExitGame(self):
+        self.client.keyPress("home")
+
+    def TakeSS(self):
         self.client.GetScreenshot(self.device["tmp"])
+
+    def __FindLocation(
+        self,
+        templateFile: str,
+        threshold: float = 0.9,
+        crop: dict = {},
+        maxRetry: int = 0,
+    ):
+        # A little python magic to ensure we always have SOME crop values
+        crop = {**self.defaultCrop, **crop}
+        self.TakeSS()
         templatePath = self.templatePath + templateFile
-
         screenshot = cv2.imread(self.device["tmp"], cv2.IMREAD_GRAYSCALE)
-
-        if len(crop) > 0:
-            screenshot = screenshot[
-                crop["top"] : crop["bottom"], crop["left"] : crop["right"]
-            ]
+        screenshot = screenshot[
+            crop["top"] : crop["bottom"], crop["left"] : crop["right"]
+        ]
 
         template = cv2.imread(templatePath, cv2.IMREAD_GRAYSCALE)
         w, h = template.shape[::-1]
         res = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
         loc = np.where(res >= threshold)
-        # print(loc)
 
         if len(loc[0]) > 0:
             data = {
@@ -97,4 +246,9 @@ class KingdomClicker:
 
             return data
 
-        return {"found": False}
+        if maxRetry:
+            sleep(self.retryDelay)
+            maxRetry -= 1
+            return self.__FindLocation(templateFile, threshold, crop, maxRetry)
+        else:
+            return {"found": False}

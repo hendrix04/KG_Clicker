@@ -5,12 +5,14 @@
     "tmp": "./tmp/pixel_3.png",
     "locations": {
         "ads": {
+            "templates": {
+                "exit": "x_btn.png"
+            },
             "exit": {
                 "top": 350,
                 "bottom": 450,
                 "left": 980,
-                "right": 1080,
-                "template": "x_btn.png"
+                "right": 1080
             }
         },
         "mith": {
@@ -22,6 +24,12 @@
             "depart": {
                 "left": 340,
                 "right": 640
+            },
+            "advMith": {
+                "left": 400,
+                "right": 600,
+                "top": 800,
+                "bottom": 1000
             },
             "spots": [
                 {
@@ -63,6 +71,9 @@
             ]
         },
         "menu": {
+            "templates": {
+                "castle": "castle_tab_button.png"
+            },
             "castle": {
                 "top": 1999,
                 "bottom": 2149,
@@ -107,11 +118,27 @@
             }
         },
         "castle": {
-            "bounty": {
-                "icon": {
-                    "left": 55,
-                    "right": 205
-                }
+            "templates": {
+                "tunnel": "dim_tunnel.png"
+            },
+            "tunnel": {
+                "top": 1700,
+                "right": 380
+            }
+        },
+        "desktop": {
+            "templates": {
+                "gameIcon": "kg_icon.png"
+            },
+            "exit": {
+                "top": 175,
+                "left": 500,
+                "bottom": 250,
+                "right": 575
+            },
+            "game": {
+                "x": 135,
+                "y": 1435
             }
         }
     }
