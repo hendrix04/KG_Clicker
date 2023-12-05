@@ -45,6 +45,7 @@ def main():
 
         kc.AttackMith(i)
 
+    kc.ExitGame()
     client.Disconnect()
     os._exit(0)
 
