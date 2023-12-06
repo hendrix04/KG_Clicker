@@ -26,26 +26,27 @@ def main():
 
     kc = KingdomClicker(client, "pixel_3.json")
 
-    kc.EnterGame()
-    sleep(2)
+    if kc.EnterGame():
+        sleep(2)
+        if kc.EnterAdvMith():
+            sleep(1)
+            if kc.ClearMith():
+                sleep(0.5)
 
-    kc.EnterAdvMith()
-    sleep(1)
+                for i in range(6):
+                    # If we are about to go into index 1, add an extra sleep
+                    # as the victory banner COULD mess up the image detection
+                    if i in range(3):
+                        sleep(4)
+                    else:
+                        sleep(1)
 
-    kc.ClearMith()
+                    kc.AttackMith(i)
+
+    sleep(0.5)
+    kc.ExitGame()
     sleep(0.5)
 
-    for i in range(5):
-        # If we are about to go into index 1, add an extra sleep
-        # as the victory banner COULD mess up the image detection
-        if i in range(3):
-            sleep(4)
-        else:
-            sleep(1)
-
-        kc.AttackMith(i)
-
-    kc.ExitGame()
     client.Disconnect()
     os._exit(0)
 

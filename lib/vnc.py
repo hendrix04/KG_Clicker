@@ -39,3 +39,6 @@ class VNC:
     def Disconnect(self):
         # Not really needed but makes my code cleaner...
         self.client.disconnect()
+
+    def KeyPress(self, key):
+        self.client.keyPress(key)

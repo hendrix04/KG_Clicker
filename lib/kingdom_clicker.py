@@ -118,6 +118,11 @@ class KingdomClicker:
         # left and the X in the upper right. Once one is detected, we know where to go
         # from there... On even loops we will check the X, on odd, the castle
         while not inGame:
+            # Failsafe in case servers are down or something.
+            # TODO: Better detection of failure case
+            if inGameAttempts == 5:
+                return False
+
             inGameAttempts += 1
             if inGameAttempts % 2 == 0:
                 # Odd Attempt
@@ -147,6 +152,7 @@ class KingdomClicker:
                         findLocationOutput["data"]["randomX"],
                         findLocationOutput["data"]["randomY"],
                     )
+                    sleep(2)
 
                     # Because there can potentially be multiple windows to close, let's
                     # now loop through until we find no more X icons...
@@ -157,6 +163,7 @@ class KingdomClicker:
                             crop=ads["exit"],
                             maxRetry=3,
                         )
+                        sleep(0.5)
 
                         if findLocationOutput["found"]:
                             self.client.MouseClick(
@@ -188,10 +195,19 @@ class KingdomClicker:
         return True
 
     def ExitGame(self):
-        self.client.keyPress("home")
+        self.client.KeyPress("esc")
+        sleep(0.4)
+        self.client.KeyPress("esc")
+        sleep(0.4)
+        self.client.KeyPress("esc")
+        sleep(0.4)
+        self.client.KeyPress("esc")
+        sleep(0.4)
+        self.client.KeyPress("home")
 
     def TakeSS(self):
         self.client.GetScreenshot(self.device["tmp"])
+        return True
 
     def __FindLocation(
         self,
