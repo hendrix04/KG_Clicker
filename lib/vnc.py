@@ -26,9 +26,39 @@ class VNC:
         y = randint(y1, y2)
         self.MouseClick(x, y)
 
-    def Scroll(self, startX: int, startY: int, endX: int, endY: int, step: int = 1):
+    # You will want a small step for percise movement such as potitioning a haka
+    # or a big step for swiping things away.
+    def Scroll(
+        self,
+        startX: int,
+        startY: int,
+        endX: int,
+        endY: int,
+        step: int = 0,
+        delay: float = 0.01,
+    ):
         self.client.mouseMove(startX, startY)
-        self.client.mouseDrag(endX, endY, step)
+        sleep(delay)
+        self.client.mouseDown(1)
+
+        while abs(startX - endX) > step or abs(startY - endY) > step:
+            if abs(startX - endX) > step:
+                if startX > endX:
+                    startX -= step
+                else:
+                    startX += step
+
+            if abs(startY - endY) > step:
+                if startY > endY:
+                    startY -= step
+                else:
+                    startY += step
+
+            self.client.mouseMove(startX, startY)
+            sleep(delay)
+
+        self.client.mouseUp(1)
+        return True
 
     def GetScreenshot(self, save_path):
         try:

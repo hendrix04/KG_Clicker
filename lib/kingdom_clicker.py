@@ -13,6 +13,7 @@ class KingdomClicker:
 
     # These are fed directly to sleep()....
     retryDelay = 1  # How long to wait until we try an image match again.
+    # TODO: This is clickDelay a good idea, but it ya know, needs to be used somewhere.
     clickDelay = 1  # How long to wait after making a click
 
     def __init__(self, client, device):
@@ -195,14 +196,20 @@ class KingdomClicker:
         return True
 
     def ExitGame(self):
-        self.client.KeyPress("esc")
-        sleep(0.4)
-        self.client.KeyPress("esc")
-        sleep(0.4)
-        self.client.KeyPress("esc")
-        sleep(0.4)
-        self.client.KeyPress("esc")
-        sleep(0.4)
+        # In order to
+        middleX = int(self.device["width"] / 2)
+        quarterY = int(self.device["height"] / 4)
+        self.client.KeyPress("ctrl-shift-esc")
+        sleep(0.2)
+        self.client.Scroll(
+            startX=middleX,
+            startY=quarterY * 3,
+            endX=middleX,
+            endY=quarterY,
+            step=50,
+        )
+
+        sleep(1.5)
         self.client.KeyPress("home")
 
     def TakeSS(self):

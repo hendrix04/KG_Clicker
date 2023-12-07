@@ -1,0 +1,1 @@
+0,20,40 19-7 * * * cd /Users/mhendrix/Projects/KG_Clicker/ && ./.venv/bin/python3 adv_mith.py
