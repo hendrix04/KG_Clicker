@@ -8,17 +8,20 @@ class VNC:
 
     client = None
 
-    def __init__(self):
+    def __init__(self, logger):
+        logger.info("Initializing VNC Client")
         self.client = api.connect("192.168.86.125", password=None)
         self.client.timeout = 30
+        self.logger = logger
 
     # The built in mouseClick didn't move the mouse nor did it add a
     # delay between press and release so I created my own wrapper
-    def MouseClick(self, x: int, y: int):
+    def MouseClick(self, x: int, y: int, delay: int = 0.1):
+        self.logger.info("Clicking Mouse")
         self.client.mouseMove(x, y)
         sleep(0.05)
         self.client.mouseDown(1)  # 1 is left button here
-        sleep(0.1)
+        sleep(delay)
         self.client.mouseUp(1)
 
     def MouseClickRandom(self, x1: int, x2: int, y1: int, y2: int):
@@ -26,7 +29,7 @@ class VNC:
         y = randint(y1, y2)
         self.MouseClick(x, y)
 
-    # You will want a small step for percise movement such as potitioning a haka
+    # You will want a small step for precise movement such as positioning a haka
     # or a big step for swiping things away.
     def Scroll(
         self,
@@ -37,6 +40,7 @@ class VNC:
         step: int = 0,
         delay: float = 0.01,
     ):
+        self.logger.info("Scrolling Mouse")
         self.client.mouseMove(startX, startY)
         sleep(delay)
         self.client.mouseDown(1)
@@ -61,6 +65,7 @@ class VNC:
         return True
 
     def GetScreenshot(self, save_path):
+        self.logger.info("Getting Screenshot")
         try:
             self.client.captureScreen(save_path)
         except TimeoutError:

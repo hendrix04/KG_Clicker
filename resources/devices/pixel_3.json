@@ -2,11 +2,11 @@
     "height": 2151,
     "width": 1088,
     "folder": "pixel_3",
-    "tmp": "./tmp/pixel_3.png",
+    "tmp": "./tmp",
     "locations": {
         "ads": {
             "templates": {
-                "exit": "x_btn.png"
+                "exit": "x_btn"
             },
             "exit": {
                 "top": 350,
@@ -17,9 +17,9 @@
         },
         "mith": {
             "templates": {
-                "spots": "adv_mith_empty.png",
-                "depart": "adv_mith_depart.png",
-                "attack": "adv_mith_attack.png"
+                "spots": "adv_mith_empty",
+                "depart": "adv_mith_depart",
+                "attack": "adv_mith_attack"
             },
             "depart": {
                 "left": 340,
@@ -72,7 +72,7 @@
         },
         "menu": {
             "templates": {
-                "castle": "castle_tab_button.png"
+                "castle": "castle_tab_button"
             },
             "castle": {
                 "top": 1999,
@@ -119,7 +119,7 @@
         },
         "castle": {
             "templates": {
-                "tunnel": "dim_tunnel.png"
+                "tunnel": "dim_tunnel"
             },
             "tunnel": {
                 "top": 1700,
@@ -128,13 +128,25 @@
         },
         "desktop": {
             "templates": {
-                "gameIcon": "kg_icon.png"
+                "gameIcon": "kg_icon"
             },
-            "exit": {
+            "gameIcon": {
                 "top": 175,
                 "left": 500,
                 "bottom": 250,
                 "right": 575
+            },
+            "appInfo": {
+                "x": 450,
+                "y": 550
+            },
+            "forceQuit": {
+                "x": 900,
+                "y": 1000
+            },
+            "confirm": {
+                "x": 880,
+                "y": 1230
             },
             "game": {
                 "x": 135,

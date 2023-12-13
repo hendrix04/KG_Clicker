@@ -27,30 +27,12 @@ def main():
     # TODO: Move this to KingdomClicker init sub
     Path("./tmp").mkdir(parents=True, exist_ok=True)
 
-    # Initiate the appropriate client... Right now we only have VNC
     client = VNC(logger=logger)
 
     kc = KingdomClicker(client=client, device="pixel_3", logger=logger)
 
-    if kc.EnterGame():
-        sleep(2)
+    kc.TakeSS()
 
-        if kc.EnterAdvMith():
-            sleep(1)
-            if kc.ClearMith():
-                sleep(0.5)
-                for i in range(6):
-                    # If we are about to go into index 1, add an extra sleep
-                    # as the victory banner COULD mess up the image detection
-                    if i in range(3):
-                        sleep(4)
-                    else:
-                        sleep(1)
-
-                    kc.AttackMith(i)
-
-    sleep(0.5)
-    kc.ExitGame()
     sleep(0.5)
 
     client.Disconnect()

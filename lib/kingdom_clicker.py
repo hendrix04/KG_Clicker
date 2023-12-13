@@ -1,12 +1,10 @@
-import cv2, pprint, os, json
-from PIL import Image
-from pathlib import Path
+import cv2, json
 import numpy as np
-from time import sleep
+from time import sleep, strftime
 from random import randint
 
 
-# Note, All public methods (aka actions) should return a boolean so that our orchestator
+# Note, All public methods (aka actions) should return a boolean so that our orchestrator
 # knows if a particular task has succeeded for failed.
 class KingdomClicker:
     """Kingdom Clicker framework! Making automation for KG Easier"""
@@ -16,24 +14,27 @@ class KingdomClicker:
     # TODO: This is clickDelay a good idea, but it ya know, needs to be used somewhere.
     clickDelay = 1  # How long to wait after making a click
 
-    def __init__(self, client, device):
+    def __init__(self, client, device, logger):
+        logger.info("Initiating KingdomClicker")
         # A client that matches what the VNC class provides function wise
         self.client = client
-        self.device = json.load(open("./resources/devices/" + device))
+        self.device = json.load(open(f"./resources/devices/{device}.json"))
         self.locations = self.device["locations"]
-        self.templatePath = "./resources/devices/" + self.device["folder"] + "/"
+        self.templatePath = f'./resources/devices/{self.device["folder"]}/'
         self.defaultCrop = {
             "left": 0,
             "right": self.device["width"],
             "top": 0,
             "bottom": self.device["height"],
         }
+        self.logger = logger
 
     # TODO: Make this more robust with image detection
     # - Check if left most hero slot is empty
     # - if so we are done
     # - If not, keep looping through clearing that first spot until it is empty
     def ClearMith(self):
+        self.logger.info("Clearing Mith")
         for i in range(5):
             # TODO: Update this to use config file
             self.client.MouseClick(150, 2000)  # Bottom left character slot in mith
@@ -48,6 +49,7 @@ class KingdomClicker:
     # - Click on Dimensional Tunnel
     # - Click on Advanced Mithril
     def EnterAdvMith(self):
+        self.logger.info("Entering Mith")
         castle = self.locations["castle"]
         castleTemplates = castle["templates"]
         advMithLocation = self.locations["mith"]["advMith"]
@@ -70,6 +72,7 @@ class KingdomClicker:
 
     # TODO: Decide if this should be private with a smarter "action" function
     def AttackMith(self, index=None):
+        self.logger.info("Attacking Mith")
         mith = self.locations["mith"]
         templates = mith["templates"]
         spots = mith["spots"]
@@ -98,6 +101,7 @@ class KingdomClicker:
         return True
 
     def EnterGame(self):
+        self.logger.info("Entering Game")
         menu = self.locations["menu"]
         menuTemplates = menu["templates"]
         ads = self.locations["ads"]
@@ -121,7 +125,9 @@ class KingdomClicker:
         while not inGame:
             # Failsafe in case servers are down or something.
             # TODO: Better detection of failure case
-            if inGameAttempts == 5:
+            if inGameAttempts >= 5:
+                self.logger.info("Failed to get into game")
+                self.TakeSS(strftime("%Y-%m-%d_%H-%M-%S"))
                 return False
 
             inGameAttempts += 1
@@ -185,36 +191,62 @@ class KingdomClicker:
 
                 else:
                     # No adds! Yay! Click on the castle to get us to our
-                    # default starting postion
+                    # default starting position
                     sleep(3)
                     self.client.MouseClick(
                         findLocationOutput["data"]["randomX"],
                         findLocationOutput["data"]["randomY"],
                     )
                     inGame = True
+                    self.logger.info("We should be fully in game now")
 
         return True
 
+    # We are getting aggressive now... The reason we need to ensure that the game is
+    # fully closed is because sometimes the game gets stuck where it cannot connect
+    # to the servers. The only way to resolve this is to ensure that the game is totally
+    # closed so that it is forced to open a net new connection each time.
+
+    # - open app switcher
+    # - Detect if KG is open by looking for icon
+    # - Long press icon
+    # - Go into app details
+    # - force close the app
     def ExitGame(self):
-        # In order to
-        middleX = int(self.device["width"] / 2)
-        quarterY = int(self.device["height"] / 4)
+        self.logger.info("Exit Game")
+        desktop = self.locations["desktop"]
+
         self.client.KeyPress("ctrl-shift-esc")
-        sleep(0.2)
-        self.client.Scroll(
-            startX=middleX,
-            startY=quarterY * 3,
-            endX=middleX,
-            endY=quarterY,
-            step=50,
+        sleep(0.75)
+        icon = self.__FindLocation(
+            desktop["templates"]["gameIcon"],
+            crop=desktop["gameIcon"],
         )
 
-        sleep(1.5)
+        if icon["found"]:
+            self.logger.info("Found icon to exit")
+            self.client.MouseClick(x=icon["randomX"], y=icon["randomY"], delay=1.5)
+            sleep(1)
+            self.client.MouseClick(desktop["appInfo"]["x"], desktop["appInfo"]["y"])
+            sleep(1)
+            self.client.MouseClick(desktop["forceQuit"]["x"], desktop["forceQuit"]["y"])
+            sleep(1)
+            self.client.MouseClick(desktop["confirm"]["x"], desktop["confirm"]["y"])
+            sleep(1)
+
         self.client.KeyPress("home")
 
-    def TakeSS(self):
-        self.client.GetScreenshot(self.device["tmp"])
+    # Filename should not include an extension
+    def TakeSS(self, fileName: str = ""):
+        filePath = self.__GenerateFilePath(fileName)
+        self.client.GetScreenshot(filePath)
         return True
+
+    def __GenerateFilePath(self, fileName: str = ""):
+        if fileName == "":
+            return f'{self.device["tmp"]}/{self.device["folder"]}.png'
+        else:
+            return f'{self.device["folder"]}/{fileName}.png'
 
     def __FindLocation(
         self,
@@ -223,18 +255,23 @@ class KingdomClicker:
         crop: dict = {},
         maxRetry: int = 0,
     ):
+        self.logger.info("Finding Location " + templateFile)
         # A little python magic to ensure we always have SOME crop values
         crop = {**self.defaultCrop, **crop}
         self.TakeSS()
-        templatePath = self.templatePath + templateFile
-        screenshot = cv2.imread(self.device["tmp"], cv2.IMREAD_GRAYSCALE)
+        templatePath = f"{self.templatePath}/{templateFile}.png"
+        self.logger.info("Loading Screenshot")
+        screenshot = cv2.imread(self.__GenerateFilePath(), cv2.IMREAD_GRAYSCALE)
         screenshot = screenshot[
             crop["top"] : crop["bottom"], crop["left"] : crop["right"]
         ]
 
+        self.logger.info("Loading Template")
         template = cv2.imread(templatePath, cv2.IMREAD_GRAYSCALE)
         w, h = template.shape[::-1]
+        self.logger.info("Matching Template")
         res = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
+        self.logger.info("Detecting Threshold")
         loc = np.where(res >= threshold)
 
         if len(loc[0]) > 0:
@@ -254,14 +291,14 @@ class KingdomClicker:
 
             # Let's get a quarter of our template size and use that as
             # bounding for our random numbers
-            xoffset = int(w / 4)
-            yoffset = int(h / 4)
+            xOffset = int(w / 4)
+            yOffset = int(h / 4)
 
             randomBounding = {
-                "top": data["top"] + yoffset,
-                "left": data["left"] + xoffset,
-                "bottom": data["bottom"] - yoffset,
-                "right": data["right"] - xoffset,
+                "top": data["top"] + yOffset,
+                "left": data["left"] + xOffset,
+                "bottom": data["bottom"] - yOffset,
+                "right": data["right"] - xOffset,
             }
 
             data["randomY"] = randint(randomBounding["top"], randomBounding["bottom"])
