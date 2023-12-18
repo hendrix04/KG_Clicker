@@ -1,8 +1,8 @@
-import pprint, os, logging
+import pprint, os, logging, json
 from time import sleep
 from pathlib import Path
-from lib.vnc import VNC
-from lib.kingdom_clicker import KingdomClicker
+from kg.vnc import VNC
+from kg.kingdom_clicker import KingdomClicker
 
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -21,7 +21,7 @@ def main():
     logging.basicConfig(filename="executions.log", format="%(asctime)s %(message)s")
     logger = logging.getLogger(__name__)
     logger.setLevel("INFO")
-
+    device = json.load(open(f"./resources/devices/pixel_3.json"))
     logger.info("Starting job")
     # setup temp dir
     # TODO: Move this to KingdomClicker init sub
@@ -29,7 +29,7 @@ def main():
 
     client = VNC(logger=logger)
 
-    kc = KingdomClicker(client=client, device="pixel_3", logger=logger)
+    kc = KingdomClicker(client=client, device=device, logger=logger)
 
     kc.TakeSS()
 

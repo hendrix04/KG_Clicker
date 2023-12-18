@@ -1,4 +1,4 @@
-import cv2, json
+import cv2
 import numpy as np
 from time import sleep, strftime
 from random import randint
@@ -18,7 +18,7 @@ class KingdomClicker:
         logger.info("Initiating KingdomClicker")
         # A client that matches what the VNC class provides function wise
         self.client = client
-        self.device = json.load(open(f"./resources/devices/{device}.json"))
+        self.device = device
         self.locations = self.device["locations"]
         self.templatePath = f'./resources/devices/{self.device["folder"]}/'
         self.defaultCrop = {
@@ -130,24 +130,20 @@ class KingdomClicker:
                 self.TakeSS(strftime("%Y-%m-%d_%H-%M-%S"))
                 return False
 
-            inGameAttempts += 1
             if inGameAttempts % 2 == 0:
-                # Odd Attempt
-                # TODO: Castle is found even if the ad screen is up... Look for something
-                # to detect that will be under the ad screen.
-                findLocationOutput = {
-                    "type": "castle",
-                    "data": self.__FindLocation(
-                        menuTemplates["castle"],
-                        crop=menu["castle"],
-                    ),
-                }
-            else:
                 findLocationOutput = {
                     "type": "x",
                     "data": self.__FindLocation(
                         adsTemplates["exit"],
                         crop=ads["exit"],
+                    ),
+                }
+            else:
+                findLocationOutput = {
+                    "type": "present",
+                    "data": self.__FindLocation(
+                        menuTemplates["present"],
+                        crop=menu["present"],
                     ),
                 }
 
@@ -159,46 +155,49 @@ class KingdomClicker:
                         findLocationOutput["data"]["randomX"],
                         findLocationOutput["data"]["randomY"],
                     )
-                    sleep(2)
+                    sleep(3)
 
                     # Because there can potentially be multiple windows to close, let's
                     # now loop through until we find no more X icons...
                     foundX = True
+                    foundXAttempts = 0
                     while foundX:
-                        findLocationOutput = self.__FindLocation(
+                        self.logger("Found X, looking for more")
+                        sleep(5)
+                        if foundXAttempts > 10:
+                            print("Failed to finish closing X")
+                            return False
+
+                        findExOutput = self.__FindLocation(
                             adsTemplates["exit"],
                             crop=ads["exit"],
-                            maxRetry=3,
                         )
-                        sleep(0.5)
 
-                        if findLocationOutput["found"]:
+                        if findExOutput["found"]:
                             self.client.MouseClick(
-                                findLocationOutput["randomX"],
-                                findLocationOutput["randomY"],
+                                findExOutput["randomX"],
+                                findExOutput["randomY"],
                             )
                         else:
                             foundX = False
 
-                    # Let's try to detect the castle again... If it is there then we
-                    # have gotten into the game. If for some reason it isn't there
-                    # then something has gone wrong and we should exit to desktop and
-                    # give up for this execution.
-                    findLocationOutput = self.__FindLocation(
-                        menuTemplates["castle"],
-                        crop=menu["castle"],
-                    )
-
+                        foundXAttempts += 1
                 else:
                     # No adds! Yay! Click on the castle to get us to our
                     # default starting position
+                    castleOutput = self.__FindLocation(
+                        menuTemplates["castle"],
+                        crop=menu["castle"],
+                    )
                     sleep(3)
                     self.client.MouseClick(
-                        findLocationOutput["data"]["randomX"],
-                        findLocationOutput["data"]["randomY"],
+                        castleOutput["randomX"],
+                        castleOutput["randomY"],
                     )
                     inGame = True
                     self.logger.info("We should be fully in game now")
+
+            inGameAttempts += 1
 
         return True
 

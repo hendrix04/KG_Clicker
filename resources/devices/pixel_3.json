@@ -72,7 +72,14 @@
         },
         "menu": {
             "templates": {
-                "castle": "castle_tab_button"
+                "castle": "castle_tab_button",
+                "present": "present"
+            },
+            "present": {
+                "top": 390,
+                "bottom": 520,
+                "left": 925,
+                "right": 1050
             },
             "castle": {
                 "top": 1999,

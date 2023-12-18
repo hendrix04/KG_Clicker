@@ -1,8 +1,8 @@
-import pprint, os, logging
+import pprint, os, logging, json
 from time import sleep
 from pathlib import Path
-from lib.vnc import VNC
-from lib.kingdom_clicker import KingdomClicker
+from kg.vnc import VNC
+from kg.kingdom_clicker import KingdomClicker
 
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -26,14 +26,14 @@ def main():
     # setup temp dir
     # TODO: Move this to KingdomClicker init sub
     Path("./tmp").mkdir(parents=True, exist_ok=True)
-
+    device = json.load(open(f"./resources/devices/pixel_3.json"))
     # Initiate the appropriate client... Right now we only have VNC
     client = VNC(logger=logger)
 
-    kc = KingdomClicker(client=client, device="pixel_3", logger=logger)
+    kc = KingdomClicker(client=client, device=device, logger=logger)
 
     if kc.EnterGame():
-        sleep(2)
+        sleep(3)
 
         if kc.EnterAdvMith():
             sleep(1)

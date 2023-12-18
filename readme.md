@@ -17,3 +17,5 @@ NOTE: Currently this is only setup and designed to work with a Pixel 3. If you h
 	 - pillow
 	 - numpy
 	 - vncdotool
+	 - apscheduler
+	 - pypyr
