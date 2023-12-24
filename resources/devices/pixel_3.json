@@ -17,13 +17,20 @@
         },
         "mith": {
             "templates": {
-                "spots": "adv_mith_empty",
-                "depart": "adv_mith_depart",
-                "attack": "adv_mith_attack"
+                "mith": "mith_empty",
+                "advMith": "adv_mith_empty",
+                "depart": "mith_depart",
+                "attack": "mith_attack"
             },
             "depart": {
                 "left": 340,
                 "right": 640
+            },
+            "mith": {
+                "left": 400,
+                "right": 600,
+                "top": 450,
+                "bottom": 650
             },
             "advMith": {
                 "left": 400,
