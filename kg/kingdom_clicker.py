@@ -162,7 +162,7 @@ class KingdomClicker:
                     foundX = True
                     foundXAttempts = 0
                     while foundX:
-                        self.logger("Found X, looking for more")
+                        self.logger.info("Found X, looking for more")
                         sleep(5)
                         if foundXAttempts > 10:
                             print("Failed to finish closing X")
@@ -215,6 +215,7 @@ class KingdomClicker:
         self.logger.info("Exit Game")
         desktop = self.locations["desktop"]
 
+
         self.client.KeyPress("ctrl-shift-esc")
         sleep(0.75)
         icon = self.__FindLocation(
@@ -245,7 +246,7 @@ class KingdomClicker:
         if fileName == "":
             return f'{self.device["tmp"]}/{self.device["folder"]}.png'
         else:
-            return f'{self.device["folder"]}/{fileName}.png'
+            return f'{self.device["tmp"]}/{self.device["folder"]}/{fileName}.png'
 
     def __FindLocation(
         self,

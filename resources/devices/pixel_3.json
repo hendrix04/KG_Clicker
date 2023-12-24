@@ -9,10 +9,10 @@
                 "exit": "x_btn"
             },
             "exit": {
-                "top": 350,
+                "top": 310,
                 "bottom": 450,
-                "left": 980,
-                "right": 1080
+                "left": 950,
+                "right": 1085
             }
         },
         "mith": {
@@ -131,6 +131,17 @@
             "tunnel": {
                 "top": 1700,
                 "right": 380
+            }
+        },
+        "dialog": {
+            "templates" :{
+                "confirm": "confirm_btn"
+            },
+            "confirm": {
+                "top": 1000,
+                "left": 300,
+                "bottom": 1300,
+                "right": 800
             }
         },
         "desktop": {

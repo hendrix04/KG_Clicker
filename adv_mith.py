@@ -49,7 +49,7 @@ def main():
 
                     kc.AttackMith(i)
 
-    sleep(0.5)
+    sleep(5)
     kc.ExitGame()
     sleep(0.5)
 
