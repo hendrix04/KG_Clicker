@@ -48,11 +48,11 @@ class KingdomClicker:
     # - Find Dimensional Tunnel in the castle view
     # - Click on Dimensional Tunnel
     # - Click on Advanced Mithril
-    def EnterAdvMith(self):
+    def EnterMith(self, level: str = "advMith"):
         self.logger.info("Entering Mith")
         castle = self.locations["castle"]
         castleTemplates = castle["templates"]
-        advMithLocation = self.locations["mith"]["advMith"]
+        mithLocation = self.locations["mith"][level]
         tunnel = self.__FindLocation(castleTemplates["tunnel"], crop=castle["tunnel"])
 
         if tunnel["found"]:
@@ -60,10 +60,10 @@ class KingdomClicker:
             sleep(3)
             # TODO: We SHOULD add image detection here
             self.client.MouseClickRandom(
-                x1=advMithLocation["left"],
-                x2=advMithLocation["right"],
-                y1=advMithLocation["top"],
-                y2=advMithLocation["bottom"],
+                x1=mithLocation["left"],
+                x2=mithLocation["right"],
+                y1=mithLocation["top"],
+                y2=mithLocation["bottom"],
             )
             sleep(3)
 
@@ -71,13 +71,13 @@ class KingdomClicker:
         return False
 
     # TODO: Decide if this should be private with a smarter "action" function
-    def AttackMith(self, index=None):
+    def AttackMith(self, level: str = "advMith", index=None):
         self.logger.info("Attacking Mith")
         mith = self.locations["mith"]
         templates = mith["templates"]
         spots = mith["spots"]
         location = {} if index is None else spots[index]
-        mine = self.__FindLocation(templates["spots"], crop=location)
+        mine = self.__FindLocation(templates[level], crop=location)
 
         if mine["found"]:
             self.client.MouseClick(mine["left"] + 100, mine["bottom"])
