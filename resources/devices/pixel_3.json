@@ -80,7 +80,9 @@
         "menu": {
             "templates": {
                 "castle": "castle_tab_button",
-                "present": "present"
+                "present": "present",
+                "alliance": "alliance_menu",
+                "back_btn": "back_btn"
             },
             "present": {
                 "top": 390,
@@ -109,26 +111,121 @@
             "alliance": {
                 "top": 1999,
                 "bottom": 2149,
-                "left": 715,
-                "right": 910
+                "left": 515,
+                "right": 1010
             },
             "world": {
                 "top": 1999,
                 "bottom": 2149,
                 "left": 900,
                 "right": 1088
+            },
+            "back_btn": {
+                "bottom": 122,
+                "right": 150
             }
         },
         "war": {
-            "titan": {
+            "templates": {
+                "haka": "haka_lg",
+                "titan": "titan"
+            },
+            "monster": {
                 "top": 220,
                 "bottom": 1950,
                 "left": 25,
                 "right": 300
             },
             "join": {
-                "left": 850,
-                "right": 1050
+                "left": 855,
+                "right": 1055
+            }
+        },
+        "events": {
+            "templates": {
+                "cornucopia": "cornucopia",
+                "haka_sm": "haka_sm",
+                "haka_med": "haka_med",
+                "go": "go_btn",
+                "summon_blue": "summon_btn_blue",
+                "summon_yellow": "summon_btn_yellow",
+                "alliance_challenge": "alliance_challenge",
+                "haka_share": "haka_share",
+                "alliance_share": "alliance_share",
+                "rally": "rally_btn",
+                "depart": "depart_sm"
+            },
+            "cornucopia": {
+                "top": 240,
+                "left": 900,
+                "bottom": 400
+            },
+            "go": {
+                "top": 1266,
+                "left": 412,
+                "bottom": 1400,
+                "right": 675
+            },
+            "alliance": {
+                "top": 640,
+                "left": 600,
+                "bottom": 740,
+                "right": 1010
+            },
+            "summon_blue": {
+                "top": 1930,
+                "left": 550,
+                "bottom": 2100,
+                "right": 950
+            },
+            "summon_yellow": {
+                "top": 1760,
+                "left": 540,
+                "bottom": 1940,
+                "right": 960
+            },
+            "haka_summon": {
+                "top": 1300,
+                "left": 400,
+                "bottom": 1600,
+                "right": 670
+            },
+            "haka_share": {
+                "top": 777,
+                "left": 777,
+                "bottom": 888,
+                "right": 888
+            },
+            "alliance_share": {
+                "y1": 1025,
+                "x1": 275,
+                "y2": 1130,
+                "x2": 870
+            },
+            "rally": {
+                "top": 1440,
+                "left": 200,
+                "bottom": 1620,
+                "right": 620
+            },
+            "haka_check": {
+                "top": 240,
+                "left": 10,
+                "bottom": 500,
+                "right": 300
+            },
+            "depart": {
+                "top": 1050,
+                "left": 375,
+                "bottom": 2020,
+                "right": 750
+            },
+            "haka_move": {
+                "startX": 573,
+                "startY": 1000,
+                "endX": 573,
+                "endY": 475,
+                "step": 2
             }
         },
         "castle": {
@@ -166,16 +263,27 @@
                 "y": 550
             },
             "forceQuit": {
-                "x": 900,
+                "x": 872,
                 "y": 1000
             },
             "confirm": {
-                "x": 880,
-                "y": 1230
+                "x": 888,
+                "y": 1240
             },
             "game": {
                 "x": 135,
                 "y": 1435
+            }
+        },
+        "alliance": {
+            "templates" :{
+                "war": "alliance_war"
+            },
+            "war": {
+                "top": 1375,
+                "left": 10,
+                "bottom": 1625,
+                "right": 370
             }
         }
     }

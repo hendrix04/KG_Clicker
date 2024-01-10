@@ -35,7 +35,7 @@ def main():
     if kc.EnterGame():
         sleep(3)
 
-        if kc.EnterMith(level="advMith"):
+        if kc.EnterMith(level="mith"):
             sleep(1)
             if kc.ClearMith():
                 sleep(0.5)
@@ -47,7 +47,7 @@ def main():
                     else:
                         sleep(1)
 
-                    kc.AttackMith(level="advMith", index=i)
+                    kc.AttackMith(level="mith", index=i)
 
     sleep(0.5)
     kc.ExitGame()

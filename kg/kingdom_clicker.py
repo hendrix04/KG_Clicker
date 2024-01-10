@@ -236,11 +236,290 @@ class KingdomClicker:
 
         self.client.KeyPress("home")
 
+    # Click into Cornucopia
+    # Search for template
+    # Click on template
+    # Click on Go
+    def EnterEvent(self, template: str):
+        events = self.locations["events"]
+        templates = events["templates"]
+
+        cornucopia = self.__FindLocation(
+            templates["cornucopia"],
+            crop=events["cornucopia"],
+            maxRetry=3
+        )
+
+        if cornucopia["found"]:
+            self.client.MouseClick(
+                cornucopia["randomX"],
+                cornucopia["randomY"],
+            )
+            sleep(3)
+
+            event = self.__FindLocation(
+                templates[template],
+                maxRetry=3
+            )
+
+            if event["found"]:
+                self.client.MouseClick(
+                    event["randomX"],
+                    event["randomY"],
+                )
+                sleep(3)
+
+                goBtn = self.__FindLocation(
+                    templates["go"],
+                    maxRetry=3
+                )
+
+                if goBtn["found"]:
+                    self.client.MouseClick(
+                        goBtn["randomX"],
+                        goBtn["randomY"],
+                    )
+
+                    return True
+
+        return False
+
+
+
+    # If Alliance: Search for Alliance tab & Click
+    # Search for blue summon & click
+    # Move Haka
+    # Search for Yellow summon & Click
+    # If Alliance: Search for share icon & click
+    # If Alliance: Search for alliance button & click
+    # Search for Rally & Click
+    # Search for Depart & Click
+    def SummonHaka(self, is_alliance: bool):
+        events = self.locations["events"]
+        templates = events["templates"]
+
+        if is_alliance:
+            alliance = self.__FindLocation(
+                templates["alliance_challenge"],
+                crop=events["alliance"],
+                maxRetry=3
+            )
+            
+            if alliance["found"]:
+                self.client.MouseClick(
+                    alliance["randomX"],
+                    alliance["randomY"],
+                )
+
+                sleep(1)
+                for i in range(50):
+                    checkSummonBlue = self.__FindLocation(
+                        templates["summon_blue"],
+                        crop=events["summon_blue"],
+                        maxRetry=3
+                    )
+            
+                    if checkSummonBlue["found"]:
+                        self.logger.info("summoning another haka")
+                        break;
+                    else:
+                        sleep(15)
+        
+        summonBlue = self.__FindLocation(
+            templates["summon_blue"],
+            crop=events["summon_blue"],
+            maxRetry=3
+        )
+        
+        if summonBlue["found"]:
+            self.client.MouseClick(
+                summonBlue["randomX"],
+                summonBlue["randomY"],
+            )
+
+            sleep(2)
+            self.client.Scroll(**events["haka_move"])
+            sleep(1)
+
+            summonYellow = self.__FindLocation(
+                templates["summon_yellow"],
+                crop=events["summon_yellow"],
+                maxRetry=3
+            )
+            
+            if summonYellow["found"]:
+                self.client.MouseClick(
+                    summonYellow["randomX"],
+                    summonYellow["randomY"],
+                )
+
+                sleep(2)
+
+                self.client.MouseClick(
+                    x=events["haka_move"]["endX"],
+                    y=events["haka_move"]["endY"]
+                )
+
+                sleep(1)
+
+                if is_alliance:
+                    hakaShare = self.__FindLocation(
+                        templates["haka_share"],
+                        #crop=events["haka_share"],
+                        maxRetry=3
+                    )
+                    
+                    if hakaShare["found"]:
+                        self.client.MouseClick(
+                            hakaShare["randomX"],
+                            hakaShare["randomY"],
+                        )
+
+                        sleep(2)
+                        self.client.MouseClickRandom(**events['alliance_share'])
+
+                rally = self.__FindLocation(
+                    templates["rally"],
+                    crop=events["rally"],
+                    maxRetry=3
+                )
+                
+                if rally["found"]:
+                    self.client.MouseClick(
+                        rally["randomX"],
+                        rally["randomY"],
+                    )
+
+                    sleep(2) 
+
+                    depart = self.__FindLocation(
+                        templates["depart"],
+                        crop=events["depart"],
+                        maxRetry=3
+                    )
+                    
+                    if depart["found"]:
+                        self.client.MouseClick(
+                            depart["randomX"],
+                            depart["randomY"],
+                        )
+
+                        return True
+        else:
+            goBtn = self.__FindLocation(
+                templates["summon_yellow"],
+                crop=events["summon_yellow"],
+                maxRetry=3
+            )
+
+        return False
+
+    def ViewWar(self):
+        alliance = self.locations["alliance"]
+        if self.__EnterAlliance():
+            sleep(1)
+
+            war = self.__FindLocation(
+                alliance["templates"]["war"],
+                crop=alliance["war"],
+                maxRetry=3
+            )
+            
+            if war["found"]:
+                self.client.MouseClick(
+                    war["randomX"],
+                    war["randomY"],
+                )
+                return True
+        return False
+
+    def DetectMonster(self, template):
+        self.logger.info(f'Detecting {template}')
+        war = self.locations["war"]
+        return self.__FindLocation(
+            war["templates"][template],
+            crop=war["monster"]
+        )
+
     # Filename should not include an extension
     def TakeSS(self, fileName: str = ""):
         filePath = self.__GenerateFilePath(fileName)
         self.client.GetScreenshot(filePath)
         return True
+
+    def __GoHome(self):
+        menu = self.locations["menu"]
+
+        castle = self.__FindLocation(
+            menu["templates"]["castle"],
+            crop=menu["castle"],
+        )
+        
+        if castle["found"]:
+            self.client.MouseClick(
+                castle["randomX"],
+                castle["randomY"],
+            )
+            return True
+
+        # If we didn't find the castle, we could be in an
+        # area with a bucket, OR we could already be on the
+        # castle tab. Let's check for those 2 scenarios.
+        backBtn = self.__FindLocation(
+            menu["templates"]["back_btn"],
+            crop=menu["back_btn"],
+        )
+        
+        if backBtn["found"]:
+            self.client.MouseClick(
+                backBtn["randomX"],
+                backBtn["randomY"],
+            )
+
+            sleep(1)
+
+            # If we found the back button, we could be 
+            # multiple buttons deep...
+            return self.__GoHome()
+        else:
+            alliance = self.__FindLocation(
+                menu["templates"]["alliance"],
+                crop=menu["alliance"],
+            )
+
+            # If we find the alliance button, we should
+            # also be able to click the castle button
+            if alliance["found"]:
+                self.client.MouseClickRandom(
+                    x1=menu["castle"]["left"],
+                    x2=menu["castle"]["right"],
+                    y1=menu["castle"]["top"],
+                    y2=menu["castle"]["bottom"]
+                )
+
+                return True
+
+        return False
+
+    def __EnterAlliance(self):
+        if self.__GoHome():
+            sleep(1)
+
+            menu = self.locations["menu"]
+
+            alliance = self.__FindLocation(
+                menu["templates"]["alliance"],
+                crop=menu["alliance"],
+            )
+            
+            if alliance["found"]:
+                self.client.MouseClick(
+                    alliance["randomX"],
+                    alliance["randomY"],
+                )
+                return True
+
+        return False
 
     def __GenerateFilePath(self, fileName: str = ""):
         if fileName == "":
